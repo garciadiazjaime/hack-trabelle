@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 
 import Document, {
   Html, Head, Main, NextScript,
@@ -22,6 +23,15 @@ class MyDocument extends Document {
           <script type="text/javascript" src="https://js.api.here.com/v3/3.0/mapsjs-mapevents.js" />
         </Head>
         <body className="custom_class">
+          <section>
+            <Link href="/">
+              <a>Home</a>
+            </Link>
+            {' '}
+            <Link href="/map">
+              <a>Map</a>
+            </Link>
+          </section>
           <Main />
           <NextScript />
         </body>
