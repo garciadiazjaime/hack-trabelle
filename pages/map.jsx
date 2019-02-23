@@ -1,8 +1,16 @@
 import { Component } from 'react';
 
-function moveMapToBerlin(map) {
-  map.setCenter({ lat: 52.5159, lng: 13.3777 });
+function moveMap(map) {
+  map.setCenter({ lat: 37.7940865, lng: -122.4115089 });
   map.setZoom(14);
+}
+
+function addMarkersToMap(map) {
+  const marker1 = new H.map.Marker({ lat: 37.7841335, lng: -122.3957437 });
+  map.addObject(marker1);
+
+  const marker2 = new H.map.Marker({ lat: 37.7927731, lng: -122.4054696 });
+  map.addObject(marker2);
 }
 
 class Map extends Component {
@@ -27,7 +35,8 @@ class Map extends Component {
 
     const behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
     const ui = H.ui.UI.createDefault(map, defaultLayers);
-    moveMapToBerlin(map);
+    moveMap(map);
+    addMarkersToMap(map);
   }
 
   render() {
