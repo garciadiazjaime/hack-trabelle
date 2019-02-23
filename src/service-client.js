@@ -1,21 +1,21 @@
-const axios = require('axios')
+/* eslint-disable */
+// const axios = require('axios');
 
 class ServiceClient {
-
   constructor(baseUrl) {
-    this.baseUrl = baseUrl
+    this.baseUrl = baseUrl;
   }
-  
+
   getDeviceInformation() {
     // return axios.get(`${this.baseUrl}/ccapi/ver100/deviceinformation`)
     return {
-      manufacterer: "Canon Inc",
-      productname: "Canon EOS",
-      guid: "guid-123412341241243",
-      serialnumber: "serial-12341234",
-      macaddress: "a1:b2:c3:d4",
-      firmwareversion: "1.1.0"
-    }
+      manufacterer: 'Canon Inc',
+      productname: 'Canon EOS',
+      guid: 'guid-123412341241243',
+      serialnumber: 'serial-12341234',
+      macaddress: 'a1:b2:c3:d4',
+      firmwareversion: '1.1.0',
+    };
   }
 
   async takePicture() {
@@ -31,9 +31,8 @@ class ServiceClient {
     // }
     // return axios.gpostet(`${this.baseUrl}/ccapi/ver100/shooting/control/shutterbutton/manual`, releaseShutter)
 
-    
 
-    return true
+    return true;
   }
 
   async getLiveView() {
@@ -52,7 +51,7 @@ class ServiceClient {
     // await axios.post(`${this.baseUrl}/ccapi/ver100/shooting/liveview`, liveViewOff)
 
     // return image
-    return "image"
+    return 'image';
   }
 
   getEventPolling() {
@@ -90,7 +89,7 @@ class ServiceClient {
       wbbracket: {},
       colorspace: {},
 
-    }
+    };
   }
 
   getShoottingSettings() {
@@ -108,24 +107,26 @@ class ServiceClient {
       afmethod: {},
       stillimagequality: {},
       stillimageaspectratio: {},
-    }
+    };
   }
 
   setShootingSetting(setting, value) {
     // setting: moviemode
     // value: { action: 'on|off' }
     // return axios.post(`${this.baseUrl}/ccapi/ver100/shooting/control/${setting}`, value)
-    return true
+    return true;
   }
 
   getMovieQuality() {
     // return axios.get(`${this.baseUrl}/ccapi/ver100/shooting/settings/moviequality`)
-    return 'fhd_5994_ipb_standard'
+    return 'fhd_5994_ipb_standard';
   }
 
   setMovieQuality(value) {
     // value: { value: 'fhd_5994_ipb_standard' }
     // return axios.put(`${this.baseUrl}/ccapi/ver100/shooting/settings/moviequality`, value)
-    return true
+    return true;
   }
 }
+
+module.exports = ServiceClient;
