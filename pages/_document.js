@@ -11,8 +11,11 @@ class MyDocument extends Document {
       <Html>
         <Head>
           <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-          <script src="http://js.api.here.com/v3/3.0/mapsjs-core.js" type="text/javascript" charset="utf-8"></script>
-          <script src="http://js.api.here.com/v3/3.0/mapsjs-service.js" type="text/javascript" charset="utf-8"></script>
+          <link rel="stylesheet" type="text/css" href="https://js.api.here.com/v3/3.0/mapsjs-ui.css?dp-version=1549984893" />
+          <script type="text/javascript" src="https://js.api.here.com/v3/3.0/mapsjs-core.js"></script>
+          <script type="text/javascript" src="https://js.api.here.com/v3/3.0/mapsjs-service.js"></script>
+          <script type="text/javascript" src="https://js.api.here.com/v3/3.0/mapsjs-ui.js"></script>
+          <script type="text/javascript" src="https://js.api.here.com/v3/3.0/mapsjs-mapevents.js"></script>
         </Head>
         <body className="custom_class">
           <Main />

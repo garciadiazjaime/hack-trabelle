@@ -1,5 +1,10 @@
 import { Component } from 'react'
 
+function moveMapToBerlin(map){
+  map.setCenter({lat:52.5159, lng:13.3777});
+  map.setZoom(14);
+}
+
 class Home extends Component {
 
   componentDidMount() {
@@ -8,14 +13,21 @@ class Home extends Component {
       'app_code': 'cSO901tAUzwSfQNSl9MdFw'
     });
 
-    const defaultLayers = platform.createDefaultLayers();
+    var pixelRatio = window.devicePixelRatio || 1;
+
+    var defaultLayers = platform.createDefaultLayers({
+      tileSize: pixelRatio === 1 ? 256 : 512,
+      ppi: pixelRatio === 1 ? undefined : 320
+    });
+    
     const map = new H.Map(
       document.getElementById('mapContainer'),
       defaultLayers.normal.map,
-      {
-        zoom: 10,
-        center: { lat: 52.5, lng: 13.4 }
-      });
+      {pixelRatio: pixelRatio});
+    
+    var behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
+    var ui = H.ui.UI.createDefault(map, defaultLayers);
+    moveMapToBerlin(map);
   }
 
   render() {
@@ -24,9 +36,8 @@ class Home extends Component {
         <div id="mapContainer"></div>
         <style jsx>{`
         #mapContainer {
-          width: 500px;
+          width: 100%;
           height: 500px;
-          background: red;
         }
       `}</style>
       </section>
