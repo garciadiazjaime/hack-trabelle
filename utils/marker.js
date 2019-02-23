@@ -66,4 +66,19 @@ function addDomMarker(map, pos) {
   map.addObject(bearsMarker);
 }
 
-export default addDomMarker;
+function addMarkersToMap(map, places) {
+  if (places && places.length) {
+    places.forEach((place) => {
+      const [lat, lng] = place.position;
+      if (lat && lng) {
+        const pos = { lat, lng };
+        addDomMarker(map, pos);
+      }
+    });
+  }
+}
+
+
+export {
+  addMarkersToMap,
+};
