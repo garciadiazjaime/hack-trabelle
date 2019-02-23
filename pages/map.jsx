@@ -1,6 +1,7 @@
-import { Component } from 'react';
+import React, { Component } from 'react';
 
-const addDomMarker = require('../components/marker');
+import addDomMarker from '../utils/marker';
+import landmarkGeocode from '../utils/search';
 
 function moveMap(map) {
   map.setCenter({ lat: 37.7940865, lng: -122.4115089 });
@@ -42,6 +43,7 @@ class Map extends Component {
 
     const pos = { lat: 37.7927731, lng: -122.4054696 };
     addDomMarker(map, pos);
+    landmarkGeocode(platform);
   }
 
   render() {
@@ -50,11 +52,11 @@ class Map extends Component {
         <div id="mapContainer" />
         <style jsx>
           {`
-        #mapContainer {
-          width: 100%;
-          height: 500px;
-        }
-      `}
+            #mapContainer {
+              width: 100%;
+              height: 500px;
+            }
+          `}
         </style>
       </section>
     );

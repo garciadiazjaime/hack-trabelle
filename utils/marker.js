@@ -66,4 +66,4 @@ function addDomMarker(map, pos) {
   map.addObject(bearsMarker);
 }
 
-module.exports = addDomMarker;
+export default addDomMarker;
