@@ -1,5 +1,7 @@
 import { Component } from 'react';
 
+const addDomMarker = require('../components/marker');
+
 function moveMap(map) {
   map.setCenter({ lat: 37.7940865, lng: -122.4115089 });
   map.setZoom(14);
@@ -37,6 +39,9 @@ class Map extends Component {
     const ui = H.ui.UI.createDefault(map, defaultLayers);
     moveMap(map);
     addMarkersToMap(map);
+
+    const pos = { lat: 37.7927731, lng: -122.4054696 };
+    addDomMarker(map, pos);
   }
 
   render() {
