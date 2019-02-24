@@ -20,7 +20,7 @@ function getMap() {
   const behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
   const ui = H.ui.UI.createDefault(map, defaultLayers);
 
-  return map;
+  return { platform, map };
 }
 
 function moveMap(map, location = { lat: 37.7940865, lng: -122.4115089 }, zoom = 14) {

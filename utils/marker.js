@@ -40,7 +40,7 @@ function addDomMarker(map, pos) {
   }
 
   function onClickHandler(evt) {
-    console.log('click', evt);
+    console.log('click');
   }
 
   // create dom icon and add/remove opacity listeners
