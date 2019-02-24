@@ -41,9 +41,11 @@ export const reducer = (state = exampleInitialState, action) => {
         userPlaces: { ...state.userPlaces, [action.placeId]: true },
       };
     case actionTypes.REMOVE_USER_PLACE:
+      const userPlaces = { ...state.userPlaces };
+      delete userPlaces[action.placeId];
       return {
         ...state,
-        userPlaces: { ...state.userPlaces, [action.placeId]: false },
+        userPlaces,
       };
     default:
       return state;

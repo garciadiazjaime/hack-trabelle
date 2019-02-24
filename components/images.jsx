@@ -19,7 +19,6 @@ class Images extends Component {
 
   render() {
     const { selectedMarker } = this.props;
-    console.log('selectedMarker', selectedMarker);
     let images = [];
     if (selectedMarker) {
       images = [
