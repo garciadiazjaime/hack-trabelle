@@ -1,4 +1,4 @@
-import { setMarker } from '../store';
+import { setMarker, addMarker } from '../store';
 
 function changeOpacity(evt) {
   evt.target.style.opacity = 0.6;
@@ -8,19 +8,7 @@ function changeOpacityToOne(evt) {
   evt.target.style.opacity = 1;
 }
 
-
-function onClickHandler(evt, placeData, selectedPlaces, dispatch) {
-  dispatch(setMarker(placeData));
-  if (!selectedPlaces[placeData.id]) {
-    selectedPlaces[placeData.id] = placeData;
-    evt.target.style.border = '3px solid';
-  } else {
-    delete selectedPlaces[placeData.id];
-    evt.target.style.border = 'none';
-  }
-}
-
-function getIconElement() {
+function getIconElement(state) {
   const outerElement = document.createElement('div');
   const innerElement = document.createElement('div');
 
@@ -32,7 +20,11 @@ function getIconElement() {
 
   innerElement.style.color = 'red';
   innerElement.style.backgroundColor = 'blue';
-  // innerElement.style.border = '2px solid black';
+  if (state === 1) {
+    innerElement.style.border = '3px solid gray';
+  } else if (state === 2) {
+    innerElement.style.border = '3px solid green';
+  }
   innerElement.style.font = 'normal 12px arial';
   innerElement.style.lineHeight = '12px';
 
@@ -54,17 +46,17 @@ function getIconElement() {
   return outerElement;
 }
 
-function addDomMarker(map, place, selectedPlaces, markers, dispatch) {
+function addDomMarker(map, place, selectedPlaces, markers, dispatch, state) {
   const [lat, lng] = place.position;
   if (lat && lng) {
     const pos = { lat, lng };
-    const iconElement = getIconElement();
+    const iconElement = getIconElement(state);
 
     const icon = new H.map.DomIcon(iconElement, {
       onAttach(clonedElement) {
         clonedElement.addEventListener('mouseover', changeOpacity);
         clonedElement.addEventListener('mouseout', changeOpacityToOne);
-        clonedElement.addEventListener('mouseup', evt => onClickHandler(evt, place, selectedPlaces, dispatch));
+        clonedElement.addEventListener('mouseup', evt => onClickHandler(evt, place, selectedPlaces, dispatch, markers, map));
       },
       onDetach(clonedElement) {
         clonedElement.removeEventListener('mouseover', changeOpacity);
@@ -77,7 +69,7 @@ function addDomMarker(map, place, selectedPlaces, markers, dispatch) {
       icon,
     });
     map.addObject(marker);
-    markers.push(marker);
+    markers[place.id] = marker;
   }
 }
 
@@ -87,7 +79,42 @@ function addMarkersToMap(map, places, selectedPlaces, markers, dispatch) {
   }
 }
 
+function cleanMarkers({
+  dispatch, placeData: place, selectedPlaces, markers, map,
+}) {
+  console.log('selectedPlaces', selectedPlaces);
+  Object.keys(selectedPlaces).forEach((placeId) => {
+    map.removeObject(markers[placeId]);
+    addDomMarker(map, selectedPlaces[placeId], selectedPlaces, markers, dispatch);
+  });
+}
+
+function onClickHandler(evt, placeData, selectedPlaces, dispatch, markers, map) {
+  // cleanMarkers({
+  //   placeData, selectedPlaces, markers, map, dispatch,
+  // });
+  dispatch(setMarker(placeData.id));
+  // if (!selectedPlaces[placeData.id]) {
+  //   selectedPlaces[placeData.id] = placeData;
+  //   evt.target.style.border = '3px solid';
+  // } else {
+  //   delete selectedPlaces[placeData.id];
+  //   evt.target.style.border = 'none';
+  // }
+}
+
+function getMarkerState({ place, selectedMarker, userPlaces }) {
+  if (userPlaces[place.id]) {
+    return 2;
+  }
+  if (place.id === selectedMarker) {
+    return 1;
+  }
+  return 0;
+}
 
 export {
   addMarkersToMap,
+  addDomMarker,
+  getMarkerState,
 };

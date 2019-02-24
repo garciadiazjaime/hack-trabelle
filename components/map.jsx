@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import { addMarkersToMap } from '../utils/marker';
+import { addMarkersToMap, addDomMarker, getMarkerState } from '../utils/marker';
 import { getPointsOfInterest } from '../utils/search';
 import { getMap, moveMap } from '../utils/map';
 import { calculateRouteFromAtoB } from '../utils/route';
-
+import { setPlaces } from '../store';
 
 class Map extends Component {
   constructor(args) {
@@ -13,6 +13,7 @@ class Map extends Component {
     this.clickHandlerThingsToDo = this.clickHandlerThingsToDo.bind(this);
     this.clickHandlerGetRoute = this.clickHandlerGetRoute.bind(this);
     this.removeMarkers = this.removeMarkers.bind(this);
+    this.printMarkers = this.printMarkers.bind(this);
     this.selectedPlaces = {};
     this.markers = [];
   }
@@ -29,19 +30,18 @@ class Map extends Component {
   }
 
   removeMarkers() {
-    this.markers.forEach(m => this.map.removeObject(m));
+    Object.keys(this.markers).forEach(placeId => this.map.removeObject(this.markers[placeId]));
     this.markers = [];
   }
 
   async clickHandlerThingsToDo() {
+    const { dispatch } = this.props;
     this.removeMarkers();
     this.selectedPlaces = {};
 
     const geoData = { lat: 37.7927731, lng: -122.4054696 };
-    this.places = await getPointsOfInterest(geoData);
-
-    const { dispatch } = this.props;
-    addMarkersToMap(this.map, this.places, this.selectedPlaces, this.markers, dispatch);
+    const places = await getPointsOfInterest(geoData);
+    dispatch(setPlaces(places));
   }
 
   clickHandlerGetRoute() {
@@ -56,7 +56,22 @@ class Map extends Component {
     }
   }
 
+  printMarkers() {
+    const {
+ places, selectedMarker, userPlaces, dispatch 
+} = this.props;
+    if (places && places.length) {
+      places.forEach((place) => {
+        const markerState = getMarkerState({ place, selectedMarker, userPlaces });
+        addDomMarker(this.map, place, this.selectedPlaces, this.markers, dispatch, markerState);
+      });
+    }
+  }
+
   render() {
+    this.removeMarkers();
+    this.printMarkers();
+
     return (
       <section>
         <div id="mapContainer" />
@@ -83,4 +98,9 @@ class Map extends Component {
   }
 }
 
-export default connect()(Map);
+function mapStateToProps(state) {
+  const { places, selectedMarker, userPlaces } = state;
+  return { places, selectedMarker, userPlaces };
+}
+
+export default connect(mapStateToProps)(Map);

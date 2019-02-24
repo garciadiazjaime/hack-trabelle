@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
 
 
 import Map from '../components/map';
@@ -16,4 +15,4 @@ class Travel extends Component {
   }
 }
 
-export default connect()(Travel);
+export default Travel;
