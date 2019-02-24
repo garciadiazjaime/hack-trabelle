@@ -63,7 +63,6 @@ class Camera extends Component {
       const newPicture = await camera.getLatestPicture()
       if(newPicture!==this.latestPicture){
         this.latestPicture = newPicture;
-        this.imageData = 
         document.getElementById('pictureContainer').src = this.latestPicture;
         document.getElementById('imageMetaData').innerHTML = paintImageData(this.imageData);
       }
