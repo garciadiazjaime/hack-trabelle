@@ -3,12 +3,12 @@ import Link from 'next/link';
 function MainMenu() {
   return (
     <nav>
-      <Link href="/">
-        <a>Home</a>
-      </Link>
-      {' '}
       <Link href="/travel">
         <a>Map</a>
+      </Link>
+      {' '}
+      <Link href="/request">
+        <a>Photographer</a>
       </Link>
       {' '}
       <Link href="/camera">
