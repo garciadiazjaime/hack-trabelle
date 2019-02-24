@@ -1,20 +1,27 @@
-import React, { Component } from 'react';
+import React from 'react';
 
 
 import Map from '../components/map';
 import Images from '../components/images';
 import UserPlaces from '../components/userPlaces';
 
-class Travel extends Component {
-  render() {
-    return (
-      <section>
+function Travel() {
+  return (
+    <section>
+      <div className="user-container">
         <Images />
         <Map />
-        <UserPlaces />
-      </section>
-    );
-  }
+      </div>
+      <UserPlaces />
+      <style jsx>
+        {`
+          .user-container {
+
+          }
+        `}
+      </style>
+    </section>
+  );
 }
 
 export default Travel;

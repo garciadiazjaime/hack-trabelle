@@ -72,7 +72,7 @@ class Map extends Component {
       places.forEach((place) => {
         const markerState = getMarkerState({ place, selectedMarker, userPlaces });
         const marker = getDomMarker({
-          place, dispatch, markerState, userPlaces, selectedMarker,
+          place, dispatch, markerState, userPlaces, selectedMarker, showImages: true,
         });
         this.map.addObject(marker);
         this.markers[place.id] = marker;
@@ -85,23 +85,21 @@ class Map extends Component {
     this.printMarkers();
 
     return (
-      <section>
+      <section id="map-container">
         <div id="mapContainer" />
         <div id="panel" />
-        <button onClick={this.clickHandlerThingsToDo}>Things To Do</button>
         <button onClick={this.clickHandlerGetRoute}>Get Route</button>
         <style jsx>
           {`
             #mapContainer {
-              width: 100%;
+              width: 50%;
               height: 500px;
             }
             #panel {
-              position:absolute;
-              width:49%;
-              left:51%;
-              height:100%;
-              background:inherit
+            }
+            #map-container button {
+              height: 100px;
+              width: 100px;
             }
           `}
         </style>
