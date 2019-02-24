@@ -1,96 +1,94 @@
-import { Component } from 'react';
+import React, { Component } from 'react';
 import ServiceClient from '../src/service-client';
 
+const baseUrl = 'http://0.0.0.0:3030';
+
 class Camera extends Component {
-  constructor(props) {
-    super (props)
-    this.latestPicture = ''
-    this.location = {latitude: 'unavailable', longitude: 'unavailable'}
-    this.configData = {}
-    this.imageData = {
-      value1: "v1",
-      value2: "v2",
-      value3: "v3"
-    }
+  static async getInitialProps({ req }) {
+    const camera = new ServiceClient({ baseUrl });
+    const resultsImages = await camera.getImages();
+    const resultsSettings = await camera.getConfig()
+    if (resultsImages.status === 200 && resultsSettings.status === 200) {
+      const image = resultsImages.data.url 
+        && resultsImages.data.url.length 
+        && resultsImages.data.url.pop().split('/').pop()
+      
+      const settings = resultsSettings.data
     
+      return {
+        image,
+        settings
+      };
+    }
 
-
+    return {};
   }
+
+  state = {
+    showModal: false,
+  }
+
+  async onClickHandler() {
+    this.setState({
+      showModal: true
+    })
+  }
+
   async componentDidMount() {
-
-    const camera = new ServiceClient('http://192.168.1.2:8080')
-
-    //Populate Variables
-    this.latestPicture = await camera.getLatestPicture()
-    this.configData = await camera.getConfigFromCamera()
-    .then((response) => formatConfigData(response))
-    this.location = getLocation()
-    this.imageData = buildImageData(this.latestPicture, this.configData, this.location)
-    
-    /* Gets device geolocation */
-    function getLocation() {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(position) {
-          return {latitude: position.coords.latitude, longitude: position.coords.longitude}
-        }, function() {
-          return {latitude: 'unavailable', longitude: 'unavailable'}
-        }, {maximumAge: 1500, timeout: 3000})
-      }
-    }  
-
-    /* Formats the config data from the camera */
-    function formatConfigData(configFromCamera) {
-      let obj = {}
-      for (var key in configFromCamera){
-        if (configFromCamera[key].value){
-          obj[key] = configFromCamera[key].value
-        }  
-      }
-
-      return obj
-    }
-
-    /* Builds Image Data Object */
-      function buildImageData(latestPicture, configData, location) {
-        let obj = {imgUrl: latestPicture ? latestPicture : null}
-        obj = {...obj, ...configData, ...location}
-
-        return obj
-      }
-
-    // Refresh rate of latest data
-    setInterval(async () => {
-      const newPicture = await camera.getLatestPicture()
-      if(newPicture!==this.latestPicture){
-        this.latestPicture = newPicture;
-        document.getElementById('pictureContainer').src = this.latestPicture;
-        document.getElementById('imageMetaData').innerHTML = paintImageData(this.imageData);
-      }
-    }, 1000)
-
-    // Paint components
-    function paintImageData(data){
-      let params = []
-      for(var key in data) {
-        params.push('<li>' + key + ': ' + data[key] +'</li>');
-      }
-
-      return params.join(' ')
-    }
-
-    document.getElementById('pictureContainer').src = this.latestPicture;
-    document.getElementById('imageMetaData').innerHTML = paintImageData(this.imageData);
-
-    
-  } 
+    const camera = new ServiceClient({ baseUrl });
+    const { image, settings } = this.props;
+    const results = await camera.savePayload({
+      image,
+      settings
+    })
+    console.log('results', results)
+  }
 
   render() {
+    const { image, settings } = this.props;
+    const { showModal } = this.state
+
     return (
-      <section>
-        <h2>Latest Picture</h2>
-        <img id="pictureContainer" width="400px" />
-        <ul id="imageMetaData"></ul>
-        <div id="location"></div>
+      <section id="camera">
+        <h2>Pictures</h2>
+        <div className="data-container" >
+          { <img src={`${baseUrl}/images/${image}`} alt="" /> }
+          <ul>
+            {
+              Object.keys(settings).map(key => {
+                return (<li key={key}>
+                  {key}: {JSON.stringify(settings[key].value)}
+                </li>)
+              })
+            }
+          </ul>
+        </div>
+        <div className="controls">
+          <button onClick={() => this.onClickHandler()}>Share</button>
+        </div>
+        {
+          showModal ?
+            <div className="modal">
+              Nobody posts on #inamonthstagram
+            </div> : null
+        }
+        <style jsx>
+          {`
+            .data-container {
+              display: flex;
+            }
+            .data-container img {
+              width: 400px;
+              height: 400px;
+            }
+            .modal {
+              width: 400px;
+              font-size: 20px;
+              border: 1px solid;
+              padding: 20px;
+            }
+          `}
+        </style>
       </section>
     );
   }

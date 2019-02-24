@@ -8,6 +8,9 @@ const exampleInitialState = {
   points: [],
   userPlaces: {},
   images: [],
+
+  photographers: [],
+  photographer: false,
 };
 
 export const actionTypes = {
@@ -16,6 +19,9 @@ export const actionTypes = {
   ADD_USER_PLACE: 'ADD_USER_PLACE',
   REMOVE_USER_PLACE: 'REMOVE_USER_PLACE',
   REMOVE_MARKER: 'REMOVE_MARKER',
+
+  SET_PHOGRAPHERS: 'SET_PHOGRAPHERS',
+  SET_PHOTOGRAPHER: 'SET_PHOTOGRAPHER',
 };
 
 // REDUCERS
@@ -49,6 +55,17 @@ export const reducer = (state = exampleInitialState, action) => {
         ...state,
         userPlaces,
       };
+
+    case actionTypes.SET_PHOGRAPHERS:
+      return {
+        ...state,
+        photographers: state.photographers.concat(action.photographers),
+      };
+    case actionTypes.SET_PHOTOGRAPHER:
+      return {
+        ...state,
+        photographer: action.photographer,
+      };
     default:
       return state;
   }
@@ -56,11 +73,18 @@ export const reducer = (state = exampleInitialState, action) => {
 
 // ACTIONS
 
+// users
+
 export const setPlaces = places => dispatch => dispatch({ type: actionTypes.SET_PLACES, places });
 export const setMarker = (marker, images) => dispatch => dispatch({ type: actionTypes.SET_MARKER, selectedMarker: marker, images });
 export const removeMarker = () => dispatch => dispatch({ type: actionTypes.REMOVE_MARKER });
 export const addUserPlace = placeId => dispatch => dispatch({ type: actionTypes.ADD_USER_PLACE, placeId });
 export const removeUserPlace = placeId => dispatch => dispatch({ type: actionTypes.REMOVE_USER_PLACE, placeId });
+
+// photographers
+
+export const setPhotographers = photographers => dispatch => dispatch({ type: actionTypes.SET_PHOGRAPHERS, photographers });
+export const setPhotographer = photographer => dispatch => dispatch({ type: actionTypes.SET_PHOTOGRAPHER, photographer });
 
 export function initializeStore(initialState = exampleInitialState) {
   return createStore(

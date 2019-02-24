@@ -52,7 +52,7 @@ class Map extends Component {
     const routePlaces = Object.keys(userPlaces).map((placeId) => {
       const place = places.find(p => p.id === placeId);
       const marker = getDomMarker({
-        place, dispatch, userPlaces, selectedMarker,
+        place, dispatch, userPlaces, selectedMarker, showImages: true,
       });
 
       this.map.addObject(marker);

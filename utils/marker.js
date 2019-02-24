@@ -57,20 +57,23 @@ function getIconElement(state) {
 }
 
 async function onClickHandler({
-  dispatch, place, userPlaces, selectedMarker,
+  dispatch, place, userPlaces, selectedMarker, showImages,
 }) {
-  if (userPlaces[place.id]) {
+  if (userPlaces && userPlaces[place.id]) {
     dispatch(removeUserPlace(place.id));
-  } else if (place.id === selectedMarker) {
+  } else if (place && place.id === selectedMarker) {
     dispatch(removeMarker());
   } else {
-    const images = await getImages(place);
+    let images = [];
+    if (showImages) {
+      images = await getImages(place);
+    }
     dispatch(setMarker(place.id, images));
   }
 }
 
 function getDomMarker({
-  place, dispatch, markerState, userPlaces, selectedMarker,
+  place, dispatch, markerState, userPlaces, selectedMarker, showImages,
 }) {
   const [lat, lng] = place.position;
   if (lat && lng) {
@@ -82,7 +85,7 @@ function getDomMarker({
         clonedElement.addEventListener('mouseover', changeOpacity);
         clonedElement.addEventListener('mouseout', changeOpacityToOne);
         clonedElement.addEventListener('mouseup', () => onClickHandler({
-          dispatch, place, userPlaces, selectedMarker,
+          dispatch, place, userPlaces, selectedMarker, showImages,
         }));
       },
       onDetach(clonedElement) {
@@ -100,10 +103,10 @@ function getDomMarker({
 }
 
 function getMarkerState({ place, selectedMarker, userPlaces }) {
-  if (userPlaces[place.id]) {
+  if (userPlaces && userPlaces[place.id]) {
     return 2;
   }
-  if (place.id === selectedMarker) {
+  if (place && place.id === selectedMarker) {
     return 1;
   }
   return 0;
