@@ -22,14 +22,8 @@ class ServiceClient {
     });
   }
 
-  /* Gets device geolocation */
-  getLocation() {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(showPosition, function() {
-        location.innerHTML = "Location unavailable" 
-      }, {maximumAge: 0, timeout: 3000})
-    }
-  }
+
+
 
 
 

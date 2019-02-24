@@ -5,8 +5,14 @@ class Camera extends Component {
   constructor(props) {
     super (props)
     this.latestPicture = ''
-    this.configFromCamera = {}
-    this.location = {}
+    this.location = {latitude: 'unavailable', longitude: 'unavailable'}
+    this.configData = {}
+    this.imageData = {
+      value1: "v1",
+      value2: "v2",
+      value3: "v3"
+    }
+    
 
 
   }
@@ -16,66 +22,75 @@ class Camera extends Component {
 
     //Populate Variables
     this.latestPicture = await camera.getLatestPicture()
-    this.configFromCamera = await camera.getConfigFromCamera()
-    this.location = await camera.getLocation()
-
-    // Paint stuff
-    document.getElementById('pictureContainer').src = this.latestPicture;
-
+    this.configData = await camera.getConfigFromCamera()
+    .then((response) => formatConfigData(response))
+    this.location = getLocation()
+    this.imageData = buildImageData(this.latestPicture, this.configData, this.location)
     
+    /* Gets device geolocation */
+    function getLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+          return {latitude: position.coords.latitude, longitude: position.coords.longitude}
+        }, function() {
+          return {latitude: 'unavailable', longitude: 'unavailable'}
+        }, {maximumAge: 1500, timeout: 3000})
+      }
+    }  
+
+    /* Formats the config data from the camera */
+    function formatConfigData(configFromCamera) {
+      let obj = {}
+      for (var key in configFromCamera){
+        if (configFromCamera[key].value){
+          obj[key] = configFromCamera[key].value
+        }  
+      }
+
+      return obj
+    }
+
+    /* Builds Image Data Object */
+      function buildImageData(latestPicture, configData, location) {
+        let obj = {imgUrl: latestPicture ? latestPicture : null}
+        obj = {...obj, ...configData, ...location}
+
+        return obj
+      }
 
     // Refresh rate of latest data
     setInterval(async () => {
       const newPicture = await camera.getLatestPicture()
       if(newPicture!==this.latestPicture){
         this.latestPicture = newPicture;
-        this.configFromCamera = await camera.getConfigFromCamera()
-
-        document.getElementById('pictureContainer').src = this.latestPicture
+        this.imageData = 
+        document.getElementById('pictureContainer').src = this.latestPicture;
+        document.getElementById('imageMetaData').innerHTML = paintImageData(this.imageData);
       }
     }, 1000)
-    
-    // POSITION
-    let location = document.getElementById("location");
 
-    function getLocation() {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(showPosition, function() {
-          location.innerHTML = "Location unavailable" 
-        }, {maximumAge: 0, timeout: 3000})
-      }
-    }
-
-    function showPosition(position) {
-      let coords = { latitude: {value: position.coords.latitude}, longitude: { value: position.coords.longitude} };
-      this.configFromCamera = {...this.configFromCamera, ...coords}
-
-      // PHOTO PARAMS
-      var params = [];
-      var savedObj = {url: this.latestPicture}
-      for (var key in cameraConfig){
-        if (this.configFromCamera[key].value){
-          params.push('<li>' + key + ': ' + this.configFromCamera[key].value +'</li>');
-        }  
+    // Paint components
+    function paintImageData(data){
+      let params = []
+      for(var key in data) {
+        params.push('<li>' + key + ': ' + data[key] +'</li>');
       }
 
-      document.getElementById('configFromCamera').innerHTML= params.join(' ')
+      return params.join(' ')
     }
 
-    getLocation();
+    document.getElementById('pictureContainer').src = this.latestPicture;
+    document.getElementById('imageMetaData').innerHTML = paintImageData(this.imageData);
 
     
-
   } 
 
   render() {
     return (
       <section>
-        <h2>DeviceInfo</h2>
-        <div id="infoContainer"></div>
         <h2>Latest Picture</h2>
         <img id="pictureContainer" width="400px" />
-        <ul id="configFromCamera"></ul>
+        <ul id="imageMetaData"></ul>
         <div id="location"></div>
       </section>
     );
