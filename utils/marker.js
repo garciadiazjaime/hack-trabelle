@@ -46,6 +46,18 @@ function getIconElement(state) {
   return outerElement;
 }
 
+function onClickHandler({
+  dispatch, place, userPlaces, selectedMarker,
+}) {
+  if (userPlaces[place.id]) {
+    dispatch(removeUserPlace(place.id));
+  } else if (place.id === selectedMarker) {
+    dispatch(removeMarker());
+  } else {
+    dispatch(setMarker(place.id));
+  }
+}
+
 function getDomMarker({
   place, dispatch, markerState, userPlaces, selectedMarker,
 }) {
@@ -73,18 +85,6 @@ function getDomMarker({
       icon,
     });
     return marker;
-  }
-}
-
-function onClickHandler({
-  dispatch, place, userPlaces, selectedMarker,
-}) {
-  if (userPlaces[place.id]) {
-    dispatch(removeUserPlace(place.id));
-  } else if (place.id === selectedMarker) {
-    dispatch(removeMarker());
-  } else {
-    dispatch(setMarker(place.id));
   }
 }
 

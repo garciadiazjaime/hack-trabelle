@@ -14,7 +14,6 @@ class Map extends Component {
     this.clickHandlerGetRoute = this.clickHandlerGetRoute.bind(this);
     this.removeMarkers = this.removeMarkers.bind(this);
     this.printMarkers = this.printMarkers.bind(this);
-    this.selectedPlaces = {};
     this.markers = [];
   }
 
@@ -37,7 +36,6 @@ class Map extends Component {
   async clickHandlerThingsToDo() {
     const { dispatch } = this.props;
     this.removeMarkers();
-    this.selectedPlaces = {};
 
     const geoData = { lat: 37.7927731, lng: -122.4054696 };
     const places = await getPointsOfInterest(geoData);
@@ -46,13 +44,24 @@ class Map extends Component {
 
   clickHandlerGetRoute() {
     this.removeMarkers();
+    const {
+      userPlaces, places, dispatch, selectedMarker,
+    } = this.props;
 
-    if (Object.keys(this.selectedPlaces).length) {
-      this.places = Object.keys(this.selectedPlaces).map(key => this.selectedPlaces[key]);
-      this.selectedPlaces = {};
 
-      // calculateRouteFromAtoB(this.platform, this.map, this.places);
-    }
+    const routePlaces = Object.keys(userPlaces).map((placeId) => {
+      const place = places.find(p => p.id === placeId);
+      const marker = getDomMarker({
+        place, dispatch, userPlaces, selectedMarker,
+      });
+
+      this.map.addObject(marker);
+      this.markers[place.id] = marker;
+
+      return place;
+    });
+
+    calculateRouteFromAtoB(this.platform, this.map, routePlaces);
   }
 
   printMarkers() {
