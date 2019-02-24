@@ -1,4 +1,4 @@
-import { setMarker, addMarker } from '../store';
+import { setMarker, removeUserPlace, removeMarker } from '../store';
 
 function changeOpacity(evt) {
   evt.target.style.opacity = 0.6;
@@ -46,17 +46,21 @@ function getIconElement(state) {
   return outerElement;
 }
 
-function addDomMarker(map, place, selectedPlaces, markers, dispatch, state) {
+function getDomMarker({
+  place, dispatch, markerState, userPlaces, selectedMarker,
+}) {
   const [lat, lng] = place.position;
   if (lat && lng) {
     const pos = { lat, lng };
-    const iconElement = getIconElement(state);
+    const iconElement = getIconElement(markerState);
 
     const icon = new H.map.DomIcon(iconElement, {
       onAttach(clonedElement) {
         clonedElement.addEventListener('mouseover', changeOpacity);
         clonedElement.addEventListener('mouseout', changeOpacityToOne);
-        clonedElement.addEventListener('mouseup', evt => onClickHandler(evt, place, selectedPlaces, dispatch, markers, map));
+        clonedElement.addEventListener('mouseup', () => onClickHandler({
+          dispatch, place, userPlaces, selectedMarker,
+        }));
       },
       onDetach(clonedElement) {
         clonedElement.removeEventListener('mouseover', changeOpacity);
@@ -68,39 +72,20 @@ function addDomMarker(map, place, selectedPlaces, markers, dispatch, state) {
     const marker = new H.map.DomMarker(pos, {
       icon,
     });
-    map.addObject(marker);
-    markers[place.id] = marker;
+    return marker;
   }
 }
 
-function addMarkersToMap(map, places, selectedPlaces, markers, dispatch) {
-  if (places && places.length) {
-    places.forEach(place => addDomMarker(map, place, selectedPlaces, markers, dispatch));
-  }
-}
-
-function cleanMarkers({
-  dispatch, placeData: place, selectedPlaces, markers, map,
+function onClickHandler({
+  dispatch, place, userPlaces, selectedMarker,
 }) {
-  console.log('selectedPlaces', selectedPlaces);
-  Object.keys(selectedPlaces).forEach((placeId) => {
-    map.removeObject(markers[placeId]);
-    addDomMarker(map, selectedPlaces[placeId], selectedPlaces, markers, dispatch);
-  });
-}
-
-function onClickHandler(evt, placeData, selectedPlaces, dispatch, markers, map) {
-  // cleanMarkers({
-  //   placeData, selectedPlaces, markers, map, dispatch,
-  // });
-  dispatch(setMarker(placeData.id));
-  // if (!selectedPlaces[placeData.id]) {
-  //   selectedPlaces[placeData.id] = placeData;
-  //   evt.target.style.border = '3px solid';
-  // } else {
-  //   delete selectedPlaces[placeData.id];
-  //   evt.target.style.border = 'none';
-  // }
+  if (userPlaces[place.id]) {
+    dispatch(removeUserPlace(place.id));
+  } else if (place.id === selectedMarker) {
+    dispatch(removeMarker());
+  } else {
+    dispatch(setMarker(place.id));
+  }
 }
 
 function getMarkerState({ place, selectedMarker, userPlaces }) {
@@ -114,7 +99,6 @@ function getMarkerState({ place, selectedMarker, userPlaces }) {
 }
 
 export {
-  addMarkersToMap,
-  addDomMarker,
+  getDomMarker,
   getMarkerState,
 };

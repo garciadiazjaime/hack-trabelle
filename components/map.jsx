@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import { addMarkersToMap, addDomMarker, getMarkerState } from '../utils/marker';
+import { getDomMarker, getMarkerState } from '../utils/marker';
 import { getPointsOfInterest } from '../utils/search';
 import { getMap, moveMap } from '../utils/map';
 import { calculateRouteFromAtoB } from '../utils/route';
@@ -51,19 +51,22 @@ class Map extends Component {
       this.places = Object.keys(this.selectedPlaces).map(key => this.selectedPlaces[key]);
       this.selectedPlaces = {};
 
-      addMarkersToMap(this.map, this.places, this.selectedPlaces, this.markers);
-      calculateRouteFromAtoB(this.platform, this.map, this.places);
+      // calculateRouteFromAtoB(this.platform, this.map, this.places);
     }
   }
 
   printMarkers() {
     const {
- places, selectedMarker, userPlaces, dispatch 
-} = this.props;
+      places, selectedMarker, userPlaces, dispatch,
+    } = this.props;
     if (places && places.length) {
       places.forEach((place) => {
         const markerState = getMarkerState({ place, selectedMarker, userPlaces });
-        addDomMarker(this.map, place, this.selectedPlaces, this.markers, dispatch, markerState);
+        const marker = getDomMarker({
+          place, dispatch, markerState, userPlaces, selectedMarker,
+        });
+        this.map.addObject(marker);
+        this.markers[place.id] = marker;
       });
     }
   }

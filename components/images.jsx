@@ -41,6 +41,7 @@ class Images extends Component {
           {`
           #images-container {
             display: flex;
+            height: 100px;
             margin: 20px 0;
           }
           .image {
