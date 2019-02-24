@@ -1,3 +1,5 @@
+import { setMarker } from '../store';
+
 function changeOpacity(evt) {
   evt.target.style.opacity = 0.6;
 }
@@ -7,7 +9,8 @@ function changeOpacityToOne(evt) {
 }
 
 
-function onClickHandler(evt, placeData, selectedPlaces) {
+function onClickHandler(evt, placeData, selectedPlaces, dispatch) {
+  dispatch(setMarker(placeData));
   if (!selectedPlaces[placeData.id]) {
     selectedPlaces[placeData.id] = placeData;
     evt.target.style.border = '3px solid';
@@ -51,7 +54,7 @@ function getIconElement() {
   return outerElement;
 }
 
-function addDomMarker(map, place, selectedPlaces, markers) {
+function addDomMarker(map, place, selectedPlaces, markers, dispatch) {
   const [lat, lng] = place.position;
   if (lat && lng) {
     const pos = { lat, lng };
@@ -61,7 +64,7 @@ function addDomMarker(map, place, selectedPlaces, markers) {
       onAttach(clonedElement) {
         clonedElement.addEventListener('mouseover', changeOpacity);
         clonedElement.addEventListener('mouseout', changeOpacityToOne);
-        clonedElement.addEventListener('mouseup', evt => onClickHandler(evt, place, selectedPlaces));
+        clonedElement.addEventListener('mouseup', evt => onClickHandler(evt, place, selectedPlaces, dispatch));
       },
       onDetach(clonedElement) {
         clonedElement.removeEventListener('mouseover', changeOpacity);
@@ -78,9 +81,9 @@ function addDomMarker(map, place, selectedPlaces, markers) {
   }
 }
 
-function addMarkersToMap(map, places, selectedPlaces, markers) {
+function addMarkersToMap(map, places, selectedPlaces, markers, dispatch) {
   if (places && places.length) {
-    places.forEach(place => addDomMarker(map, place, selectedPlaces, markers));
+    places.forEach(place => addDomMarker(map, place, selectedPlaces, markers, dispatch));
   }
 }
 

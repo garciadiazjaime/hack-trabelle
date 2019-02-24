@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 
 import { addMarkersToMap } from '../utils/marker';
 import { getPointsOfInterest } from '../utils/search';
@@ -38,7 +39,9 @@ class Map extends Component {
 
     const geoData = { lat: 37.7927731, lng: -122.4054696 };
     this.places = await getPointsOfInterest(geoData);
-    addMarkersToMap(this.map, this.places, this.selectedPlaces, this.markers);
+
+    const { dispatch } = this.props;
+    addMarkersToMap(this.map, this.places, this.selectedPlaces, this.markers, dispatch);
   }
 
   clickHandlerGetRoute() {
@@ -80,4 +83,4 @@ class Map extends Component {
   }
 }
 
-export default Map;
+export default connect()(Map);
