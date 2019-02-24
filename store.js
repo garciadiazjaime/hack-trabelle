@@ -7,6 +7,7 @@ const exampleInitialState = {
   places: [],
   points: [],
   userPlaces: {},
+  images: [],
 };
 
 export const actionTypes = {
@@ -29,6 +30,7 @@ export const reducer = (state = exampleInitialState, action) => {
       return {
         ...state,
         selectedMarker: action.selectedMarker,
+        images: action.images,
       };
     case actionTypes.REMOVE_MARKER:
       return {
@@ -55,7 +57,7 @@ export const reducer = (state = exampleInitialState, action) => {
 // ACTIONS
 
 export const setPlaces = places => dispatch => dispatch({ type: actionTypes.SET_PLACES, places });
-export const setMarker = marker => dispatch => dispatch({ type: actionTypes.SET_MARKER, selectedMarker: marker });
+export const setMarker = (marker, images) => dispatch => dispatch({ type: actionTypes.SET_MARKER, selectedMarker: marker, images });
 export const removeMarker = () => dispatch => dispatch({ type: actionTypes.REMOVE_MARKER });
 export const addUserPlace = placeId => dispatch => dispatch({ type: actionTypes.ADD_USER_PLACE, placeId });
 export const removeUserPlace = placeId => dispatch => dispatch({ type: actionTypes.REMOVE_USER_PLACE, placeId });

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+
 import { addUserPlace } from '../store';
 
 class Images extends Component {
@@ -18,15 +19,7 @@ class Images extends Component {
   }
 
   render() {
-    const { selectedMarker } = this.props;
-    let images = [];
-    if (selectedMarker) {
-      images = [
-        'https://www.sftravel.com/sites/sftraveldev.prod.acquia-sites.com/files/landmark-images/golden-gate_web.jpg',
-        'http://www.travelodgepresidio.com/images/slider/slide5.jpg',
-        'http://www.firstclasstours.net/wp-content/uploads/2018/03/San-Franciscos-Golden-Gate-Bridge.jpg',
-      ];
-    }
+    const { selectedMarker, places, images } = this.props;
 
     return (
       <div id="images-container">
@@ -59,8 +52,8 @@ class Images extends Component {
 }
 
 function mapStateToProps(state) {
-  const { selectedMarker, places } = state;
-  return { selectedMarker, places };
+  const { selectedMarker, places, images } = state;
+  return { selectedMarker, places, images };
 }
 
 export default connect(mapStateToProps)(Images);

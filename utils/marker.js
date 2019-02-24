@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 import { setMarker, removeUserPlace, removeMarker } from '../store';
 
 function changeOpacity(evt) {
@@ -6,6 +8,14 @@ function changeOpacity(evt) {
 
 function changeOpacityToOne(evt) {
   evt.target.style.opacity = 1;
+}
+
+async function getImages(place) {
+  const results = await axios.get(place.href);
+  if (results.status === 200) {
+    return results.data.media.images.items.slice(0, 5).map(item => item.src);
+  }
+  return [];
 }
 
 function getIconElement(state) {
@@ -46,7 +56,7 @@ function getIconElement(state) {
   return outerElement;
 }
 
-function onClickHandler({
+async function onClickHandler({
   dispatch, place, userPlaces, selectedMarker,
 }) {
   if (userPlaces[place.id]) {
@@ -54,7 +64,8 @@ function onClickHandler({
   } else if (place.id === selectedMarker) {
     dispatch(removeMarker());
   } else {
-    dispatch(setMarker(place.id));
+    const images = await getImages(place);
+    dispatch(setMarker(place.id, images));
   }
 }
 
