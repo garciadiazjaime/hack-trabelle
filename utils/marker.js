@@ -1,7 +1,24 @@
-function addDomMarker(map, pos) {
+function changeOpacity(evt) {
+  evt.target.style.opacity = 0.6;
+}
+
+function changeOpacityToOne(evt) {
+  evt.target.style.opacity = 1;
+}
+
+
+function onClickHandler(evt, placeData, selectedPlaces) {
+  if (!selectedPlaces[placeData.id]) {
+    selectedPlaces[placeData.id] = placeData;
+    evt.target.style.border = '3px solid';
+  } else {
+    delete selectedPlaces[placeData.id];
+    evt.target.style.border = 'none';
+  }
+}
+
+function getIconElement() {
   const outerElement = document.createElement('div');
-
-
   const innerElement = document.createElement('div');
 
   outerElement.style.userSelect = 'none';
@@ -12,7 +29,7 @@ function addDomMarker(map, pos) {
 
   innerElement.style.color = 'red';
   innerElement.style.backgroundColor = 'blue';
-  innerElement.style.border = '2px solid black';
+  // innerElement.style.border = '2px solid black';
   innerElement.style.font = 'normal 12px arial';
   innerElement.style.lineHeight = '12px';
 
@@ -31,50 +48,39 @@ function addDomMarker(map, pos) {
   // Add text to the DOM element
   innerElement.innerHTML = 'C';
 
-  function changeOpacity(evt) {
-    evt.target.style.opacity = 0.6;
-  }
-
-  function changeOpacityToOne(evt) {
-    evt.target.style.opacity = 1;
-  }
-
-  function onClickHandler(evt) {
-    console.log('click');
-  }
-
-  // create dom icon and add/remove opacity listeners
-  const domIcon = new H.map.DomIcon(outerElement, {
-    // the function is called every time marker enters the viewport
-    onAttach(clonedElement, domIcon, domMarker) {
-      clonedElement.addEventListener('mouseover', changeOpacity);
-      clonedElement.addEventListener('mouseout', changeOpacityToOne);
-      clonedElement.addEventListener('mouseup', onClickHandler);
-    },
-    // the function is called every time marker leaves the viewport
-    onDetach(clonedElement, domIcon, domMarker) {
-      clonedElement.removeEventListener('mouseover', changeOpacity);
-      clonedElement.removeEventListener('mouseout', changeOpacityToOne);
-      clonedElement.removeEventListener('mouseup', onClickHandler);
-    },
-  });
-
-  // Marker for Chicago Bears home
-  const bearsMarker = new H.map.DomMarker(pos, {
-    icon: domIcon,
-  });
-  map.addObject(bearsMarker);
+  return outerElement;
 }
 
-function addMarkersToMap(map, places) {
-  if (places && places.length) {
-    places.forEach((place) => {
-      const [lat, lng] = place.position;
-      if (lat && lng) {
-        const pos = { lat, lng };
-        addDomMarker(map, pos);
-      }
+function addDomMarker(map, place, selectedPlaces, markers) {
+  const [lat, lng] = place.position;
+  if (lat && lng) {
+    const pos = { lat, lng };
+    const iconElement = getIconElement();
+
+    const icon = new H.map.DomIcon(iconElement, {
+      onAttach(clonedElement) {
+        clonedElement.addEventListener('mouseover', changeOpacity);
+        clonedElement.addEventListener('mouseout', changeOpacityToOne);
+        clonedElement.addEventListener('mouseup', evt => onClickHandler(evt, place, selectedPlaces));
+      },
+      onDetach(clonedElement) {
+        clonedElement.removeEventListener('mouseover', changeOpacity);
+        clonedElement.removeEventListener('mouseout', changeOpacityToOne);
+        clonedElement.removeEventListener('mouseup', onClickHandler);
+      },
     });
+
+    const marker = new H.map.DomMarker(pos, {
+      icon,
+    });
+    map.addObject(marker);
+    markers.push(marker);
+  }
+}
+
+function addMarkersToMap(map, places, selectedPlaces, markers) {
+  if (places && places.length) {
+    places.forEach(place => addDomMarker(map, place, selectedPlaces, markers));
   }
 }
 
