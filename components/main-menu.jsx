@@ -7,7 +7,7 @@ function MainMenu() {
         <a>Home</a>
       </Link>
       {' '}
-      <Link href="/map">
+      <Link href="/travel">
         <a>Map</a>
       </Link>
     </nav>

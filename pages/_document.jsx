@@ -14,7 +14,7 @@ class MyDocument extends Document {
 
   render() {
     const { pathname } = this.props;
-    const mapPaths = ['/map'];
+    const mapPaths = ['/travel'];
 
     return (
       <Html>
