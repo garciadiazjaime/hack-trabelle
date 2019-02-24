@@ -10,6 +10,10 @@ function MainMenu() {
       <Link href="/travel">
         <a>Map</a>
       </Link>
+      {' '}
+      <Link href="/camera">
+        <a>Camera</a>
+      </Link>
     </nav>
   );
 }

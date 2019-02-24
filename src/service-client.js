@@ -1,22 +1,44 @@
 /* eslint-disable */
-// const axios = require('axios');
+const axios = require('axios');
 
 class ServiceClient {
   constructor(baseUrl) {
     this.baseUrl = baseUrl;
   }
 
-  getDeviceInformation() {
-    // return axios.get(`${this.baseUrl}/ccapi/ver100/deviceinformation`)
-    return {
-      manufacterer: 'Canon Inc',
-      productname: 'Canon EOS',
-      guid: 'guid-123412341241243',
-      serialnumber: 'serial-12341234',
-      macaddress: 'a1:b2:c3:d4',
-      firmwareversion: '1.1.0',
-    };
+  /* Gets the picture that was created last in the camera */
+  async getLatestPicture() {
+    return axios.get(`${this.baseUrl}/ccapi/ver100/contents/sd/100CANON/`)
+    .then(function(response){
+      return response.data.url[response.data.url.length-1]
+    });
   }
+  
+  /* Gets the current camera configuration */
+  getConfigFromCamera() {
+    return axios.get(`${this.baseUrl}/ccapi/ver100/shooting/settings`)
+    .then(function(response){
+      return response.data
+    });
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  /* THESE FUNCTIONS ARE CURRENTLY NOT USED IN THE APP */
+  getDeviceInformation() {
+    return axios.get(`${this.baseUrl}/ccapi/ver100/deviceinformation`)
+  } 
 
   async takePicture() {
     // const activiateShutter = {
@@ -89,24 +111,6 @@ class ServiceClient {
       wbbracket: {},
       colorspace: {},
 
-    };
-  }
-
-  getShoottingSettings() {
-    // return axios.get(`${this.baseUrl}/ccapi/ver100/shooting/settings`)
-    return {
-      shootingmode: {},
-      shootingmodedial: {},
-      av: {},
-      tv: {},
-      iso: {},
-      exposure: {},
-      wb: {},
-      colortemperature: {},
-      afoperation: {},
-      afmethod: {},
-      stillimagequality: {},
-      stillimageaspectratio: {},
     };
   }
 
