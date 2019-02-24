@@ -1,7 +1,25 @@
-function addDomMarker(map, pos) {
+import axios from 'axios';
+
+import { setMarker, removeUserPlace, removeMarker } from '../store';
+
+function changeOpacity(evt) {
+  evt.target.style.opacity = 0.6;
+}
+
+function changeOpacityToOne(evt) {
+  evt.target.style.opacity = 1;
+}
+
+async function getImages(place) {
+  const results = await axios.get(place.href);
+  if (results.status === 200) {
+    return results.data.media.images.items.slice(0, 5).map(item => item.src);
+  }
+  return [];
+}
+
+function getIconElement(state) {
   const outerElement = document.createElement('div');
-
-
   const innerElement = document.createElement('div');
 
   outerElement.style.userSelect = 'none';
@@ -12,7 +30,11 @@ function addDomMarker(map, pos) {
 
   innerElement.style.color = 'red';
   innerElement.style.backgroundColor = 'blue';
-  innerElement.style.border = '2px solid black';
+  if (state === 1) {
+    innerElement.style.border = '3px solid gray';
+  } else if (state === 2) {
+    innerElement.style.border = '3px solid green';
+  }
   innerElement.style.font = 'normal 12px arial';
   innerElement.style.lineHeight = '12px';
 
@@ -31,54 +53,63 @@ function addDomMarker(map, pos) {
   // Add text to the DOM element
   innerElement.innerHTML = 'C';
 
-  function changeOpacity(evt) {
-    evt.target.style.opacity = 0.6;
-  }
-
-  function changeOpacityToOne(evt) {
-    evt.target.style.opacity = 1;
-  }
-
-  function onClickHandler(evt) {
-    console.log('click');
-  }
-
-  // create dom icon and add/remove opacity listeners
-  const domIcon = new H.map.DomIcon(outerElement, {
-    // the function is called every time marker enters the viewport
-    onAttach(clonedElement, domIcon, domMarker) {
-      clonedElement.addEventListener('mouseover', changeOpacity);
-      clonedElement.addEventListener('mouseout', changeOpacityToOne);
-      clonedElement.addEventListener('mouseup', onClickHandler);
-    },
-    // the function is called every time marker leaves the viewport
-    onDetach(clonedElement, domIcon, domMarker) {
-      clonedElement.removeEventListener('mouseover', changeOpacity);
-      clonedElement.removeEventListener('mouseout', changeOpacityToOne);
-      clonedElement.removeEventListener('mouseup', onClickHandler);
-    },
-  });
-
-  // Marker for Chicago Bears home
-  const bearsMarker = new H.map.DomMarker(pos, {
-    icon: domIcon,
-  });
-  map.addObject(bearsMarker);
+  return outerElement;
 }
 
-function addMarkersToMap(map, places) {
-  if (places && places.length) {
-    places.forEach((place) => {
-      const [lat, lng] = place.position;
-      if (lat && lng) {
-        const pos = { lat, lng };
-        addDomMarker(map, pos);
-      }
+async function onClickHandler({
+  dispatch, place, userPlaces, selectedMarker,
+}) {
+  if (userPlaces[place.id]) {
+    dispatch(removeUserPlace(place.id));
+  } else if (place.id === selectedMarker) {
+    dispatch(removeMarker());
+  } else {
+    const images = await getImages(place);
+    dispatch(setMarker(place.id, images));
+  }
+}
+
+function getDomMarker({
+  place, dispatch, markerState, userPlaces, selectedMarker,
+}) {
+  const [lat, lng] = place.position;
+  if (lat && lng) {
+    const pos = { lat, lng };
+    const iconElement = getIconElement(markerState);
+
+    const icon = new H.map.DomIcon(iconElement, {
+      onAttach(clonedElement) {
+        clonedElement.addEventListener('mouseover', changeOpacity);
+        clonedElement.addEventListener('mouseout', changeOpacityToOne);
+        clonedElement.addEventListener('mouseup', () => onClickHandler({
+          dispatch, place, userPlaces, selectedMarker,
+        }));
+      },
+      onDetach(clonedElement) {
+        clonedElement.removeEventListener('mouseover', changeOpacity);
+        clonedElement.removeEventListener('mouseout', changeOpacityToOne);
+        clonedElement.removeEventListener('mouseup', onClickHandler);
+      },
     });
+
+    const marker = new H.map.DomMarker(pos, {
+      icon,
+    });
+    return marker;
   }
 }
 
+function getMarkerState({ place, selectedMarker, userPlaces }) {
+  if (userPlaces[place.id]) {
+    return 2;
+  }
+  if (place.id === selectedMarker) {
+    return 1;
+  }
+  return 0;
+}
 
 export {
-  addMarkersToMap,
+  getDomMarker,
+  getMarkerState,
 };
